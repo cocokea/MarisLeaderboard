@@ -1,0 +1,187 @@
+gui:
+  main:
+    title: "ʟᴇᴀᴅᴇʀʙᴏᴀʀᴅ"
+    rows: 3
+  board:
+    title: "{category} - Trang {page}"
+    rows: 6
+
+settings:
+  refresh-ticks: 600
+  async-threads: 1
+  max-search-results: 45
+  placeholders:
+    money: "%vault_eco_balance%"
+    shards: "%shards_value%"
+    kills: "%statistic_player_kills%"
+    deaths: "%statistic_deaths%"
+    playtime: "%plan_player_time_total%"
+  category-meta:
+    money:
+      display-name: "Money"
+      compact: true
+    shards:
+      display-name: "Shards"
+      compact: true
+    kills:
+      display-name: "Kills"
+      compact: false
+    deaths:
+      display-name: "Deaths"
+      compact: false
+    playtime:
+      display-name: "Playtime"
+      compact: false
+  format:
+    number-short-enabled: true
+    number-decimals: 1
+    time-use-placeholder-value: true
+    thousands-short:
+      1000: K
+      1000000: M
+      1000000000: B
+      1000000000000: T
+
+menu-items:
+  categories:
+    money:
+      slot: 10
+      material: GOLD_INGOT
+      name: "&#00FFAAᴍᴏɴᴇʏ"
+      lore:
+        - "&fClick vào để xem bảng xếp hạng này"
+    shards:
+      slot: 11
+      material: AMETHYST_SHARD
+      name: "&#00FFAAꜱʜᴀʀᴅꜱ"
+      lore:
+        - "&fClick vào để xem bảng xếp hạng này"
+    kills:
+      slot: 12
+      material: DIAMOND_SWORD
+      name: "&#00FFAAᴋɪʟʟꜱ"
+      lore:
+        - "&fClick vào để xem bảng xếp hạng này"
+    deaths:
+      slot: 13
+      material: SKELETON_SKULL
+      name: "&#00FFAAᴅᴇᴀᴛʜꜱ"
+      lore:
+        - "&fClick vào để xem bảng xếp hạng này"
+    playtime:
+      slot: 14
+      material: CLOCK
+      name: "&#00FFAAᴘʟᴀʏᴛɪᴍᴇ"
+      lore:
+        - "&fClick vào để xem bảng xếp hạng này"
+  previous-page:
+    slot: 45
+    material: ARROW
+    name: "&#00FFAAᴛʀᴀɴɢ ᴛʀướᴄ"
+    lore:
+      - "&fClick để lùi trang trước"
+  next-page:
+    slot: 53
+    material: ARROW
+    name: "&#00FFAAᴛʀᴀɴɢ sᴀᴜ"
+    lore:
+      - "&fClick để tới trang sau"
+  self:
+    slot: 48
+    name: "&#00FFAA{player}"
+    lore:
+      - "&f{category}: &7{value} &#00FFAA(#{rank})"
+  refresh:
+    slot: 49
+    material: ANVIL
+    name: "&#00FFAAʟàᴍ ᴍớɪ"
+    lore:
+      - "&fClick để làm mới"
+  search:
+    slot: 50
+    material: OAK_SIGN
+    name: "&#00FFAAᴛìᴍ ᴋɪếᴍ"
+    lore:
+      - "&fClick để tìm kiếm"
+  entry:
+    name: "&#00FFAA{player}"
+    lore:
+      - "&f{category}: &7{value} &#00FFAA(#{rank})"
+
+search:
+  timeout-seconds: 60
+  sign-lines:
+    - "^^^^^^^^^^^^"
+    - "&0[&#00FFAASearch&0]"
+    - "&0Nhập tên"
+    - ""
+
+sounds:
+  open-main:
+    enabled: true
+    sound: UI_BUTTON_CLICK
+    volume: 1.0
+    pitch: 1.15
+  click:
+    enabled: true
+    sound: UI_BUTTON_CLICK
+    volume: 1.0
+    pitch: 1.0
+  refresh:
+    enabled: true
+    sound: BLOCK_ANVIL_USE
+    volume: 1.0
+    pitch: 1.1
+  search:
+    enabled: true
+    sound: BLOCK_NOTE_BLOCK_PLING
+    volume: 1.0
+    pitch: 1.2
+  reload:
+    enabled: true
+    sound: BLOCK_NOTE_BLOCK_PLING
+    volume: 1.0
+    pitch: 1.25
+
+messages:
+  reload: "&#00FFAAĐã reload MarisLeaderboard."
+  no-permission: "&#FF5555Bạn không có quyền dùng lệnh này."
+  player-only: "&#FF5555Chỉ người chơi mới dùng được lệnh này."
+
+database:
+  type: SQLITE
+  table: maris_leaderboard_data
+  sqlite:
+    file: plugins/MarisLeaderboard/data.db
+  mysql:
+    host: 127.0.0.1
+    port: 3306
+    database: marisleaderboard
+    username: root
+    password: password
+    parameters: "useSSL=false&characterEncoding=utf8&serverTimezone=UTC"
+  hikari:
+    pool-name: MarisLeaderboardPool
+    maximum-pool-size: 4
+    minimum-idle: 1
+    max-lifetime: 1800000
+    keepalive-time: 0
+    connection-timeout: 10000
+    validation-timeout: 5000
+    leak-detection-threshold: 0
+
+performance:
+  batch-size: 100
+  use-cache: true
+  cache-top-size: 200
+  cache-search-size: 100
+  update-on-join: true
+  update-on-quit: true
+  update-on-command-open: true
+  debounce-click-ms: 150
+  cancel-bottom-inventory-click: false
+  cancel-double-click: false
+  cancel-drag: false
+  block-shift-move: false
+  packet-guard-enabled: false
+  packet-guard-debug: false

@@ -1,5 +1,6 @@
 package com.maris7.leaderboard;
 
+import com.github.retrooper.packetevents.PacketEvents;
 import com.maris7.leaderboard.command.LeaderboardCommand;
 import com.maris7.leaderboard.config.PluginConfig;
 import com.maris7.leaderboard.data.DatabaseManager;
@@ -8,6 +9,7 @@ import com.maris7.leaderboard.gui.LeaderboardGuiManager;
 import com.maris7.leaderboard.hook.PlaceholderHook;
 import com.maris7.leaderboard.listener.InventoryListener;
 import com.maris7.leaderboard.listener.PlayerActivityListener;
+import com.maris7.leaderboard.listener.SignInputPacketListener;
 import com.maris7.leaderboard.service.LeaderboardService;
 import com.maris7.leaderboard.service.SignSearchService;
 import org.bukkit.command.PluginCommand;
@@ -21,10 +23,21 @@ public final class MarisLeaderboardPlugin extends JavaPlugin {
     private LeaderboardService leaderboardService;
     private LeaderboardGuiManager guiManager;
     private SignSearchService signSearchService;
+    private SignInputPacketListener signInputPacketListener;
 
     @Override
     public void onEnable() {
+        
         saveDefaultConfig();
+        MarisPluginStartup.bootstrap(this, "cocokea/MarisLeaderboard");
+saveDefaultConfig();
+        if (!getDataFolder().exists()) {
+            getDataFolder().mkdirs();
+        }
+        java.io.File soundsFile = getDataFolder().toPath().resolve("sounds.yml").toFile();
+        if (!soundsFile.exists()) {
+            saveResource("sounds.yml", false);
+        }
         bootstrap(false);
     }
 
@@ -51,6 +64,12 @@ public final class MarisLeaderboardPlugin extends JavaPlugin {
             this.leaderboardService = new LeaderboardService(this, pluginConfig, repository, placeholderHook);
             this.guiManager = new LeaderboardGuiManager(this, pluginConfig, leaderboardService);
             this.signSearchService = new SignSearchService(this, pluginConfig);
+            if (signSearchService.isPacketEventsAvailable()) {
+                this.signInputPacketListener = new SignInputPacketListener(signSearchService);
+                PacketEvents.getAPI().getEventManager().registerListener(signInputPacketListener);
+            } else {
+                getLogger().warning("PacketEvents was not found. Sign input features will stay disabled until PacketEvents is installed.");
+            }
 
             leaderboardService.start();
 
@@ -87,6 +106,10 @@ public final class MarisLeaderboardPlugin extends JavaPlugin {
     @Override
     public void onDisable() {
         if (signSearchService != null) signSearchService.clearAll();
+        if (signInputPacketListener != null && PacketEvents.getAPI() != null) {
+            PacketEvents.getAPI().getEventManager().unregisterListener(signInputPacketListener);
+            signInputPacketListener = null;
+        }
         if (leaderboardService != null) leaderboardService.shutdown();
         if (databaseManager != null) databaseManager.shutdown();
     }

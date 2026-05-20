@@ -82,7 +82,6 @@ public final class InventoryListener implements Listener {
             return;
         }
         if (slot == config.searchSlot()) {
-            guiManager.playSound(player, "search", Sound.BLOCK_NOTE_BLOCK_PLING, 1.0f, 1.2f);
             guiManager.suppressNextPlayerClose(player);
             // Delay closeInventory to next tick — calling it directly inside InventoryClickEvent
             // only closes the inventory server-side; the client never receives the close packet

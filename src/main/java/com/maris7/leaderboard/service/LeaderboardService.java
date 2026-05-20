@@ -13,6 +13,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public final class LeaderboardService {
     private final JavaPlugin plugin;
@@ -22,6 +23,7 @@ public final class LeaderboardService {
     private final ExecutorService executorService;
     private final Map<String, List<LeaderboardEntry>> cache = new ConcurrentHashMap<>();
     private final Set<UUID> queuedPlayers = ConcurrentHashMap.newKeySet();
+    private final AtomicBoolean shuttingDown = new AtomicBoolean(false);
 
     public LeaderboardService(JavaPlugin plugin, PluginConfig config, LeaderboardRepository repository, PlaceholderHook placeholderHook) {
         this.plugin = plugin;
@@ -37,33 +39,21 @@ public final class LeaderboardService {
     }
 
     public void shutdown() {
-        try {
-            saveOnlinePlayersSync();
-        } finally {
-            executorService.shutdownNow();
-        }
-    }
-
-    private void saveOnlinePlayersSync() {
-        List<PlayerLeaderboardData> batch = new ArrayList<>();
-        for (Player player : org.bukkit.Bukkit.getOnlinePlayers()) {
-            if (player != null && player.isOnline()) {
-                batch.add(readPlayerOnPlayerThread(player));
-            }
-        }
-        if (!batch.isEmpty()) {
-            repository.upsertBatch(batch, config.categories());
-        }
+        shuttingDown.set(true);
+        executorService.shutdownNow();
     }
 
     public void queueUpdate(Player player) {
+        if (shuttingDown.get()) {
+            return;
+        }
         UUID uniqueId = player.getUniqueId();
         if (!queuedPlayers.add(uniqueId)) {
             return;
         }
         readPlayer(uniqueId).thenAccept(data -> {
             try {
-                if (data != null) {
+                if (data != null && !shuttingDown.get() && !executorService.isShutdown()) {
                     executorService.submit(() -> repository.upsert(data, config.categories()));
                 }
             } finally {
@@ -73,7 +63,13 @@ public final class LeaderboardService {
     }
 
     public void refreshAllOnline() {
+        if (shuttingDown.get()) {
+            return;
+        }
         SchedulerUtil.onlinePlayerSnapshot(plugin, playerIds -> {
+            if (shuttingDown.get()) {
+                return;
+            }
             if (playerIds.isEmpty()) {
                 return;
             }
@@ -85,7 +81,7 @@ public final class LeaderboardService {
                         .map(CompletableFuture::join)
                         .filter(Objects::nonNull)
                         .toList();
-                if (!batch.isEmpty()) {
+                if (!batch.isEmpty() && !shuttingDown.get() && !executorService.isShutdown()) {
                     executorService.submit(() -> repository.upsertBatch(batch, config.categories()));
                 }
             });
@@ -93,9 +89,16 @@ public final class LeaderboardService {
     }
 
     private CompletableFuture<PlayerLeaderboardData> readPlayer(UUID playerId) {
+        if (shuttingDown.get()) {
+            return CompletableFuture.completedFuture(null);
+        }
         CompletableFuture<PlayerLeaderboardData> future = new CompletableFuture<>();
         SchedulerUtil.runPlayerOrElse(plugin, playerId, player -> {
             try {
+                if (shuttingDown.get()) {
+                    future.complete(null);
+                    return;
+                }
                 future.complete(readPlayerOnPlayerThread(player));
             } catch (Throwable throwable) {
                 future.completeExceptionally(throwable);
@@ -117,6 +120,9 @@ public final class LeaderboardService {
     }
 
     public void refreshCache() {
+        if (shuttingDown.get()) {
+            return;
+        }
         for (LeaderboardCategory category : config.categories()) {
             cache.put(category.key(), repository.top(category, config.cacheTopSize()));
         }
@@ -127,16 +133,27 @@ public final class LeaderboardService {
     }
 
     public CompletableFuture<List<LeaderboardEntry>> search(LeaderboardCategory category, String query) {
+        if (shuttingDown.get() || executorService.isShutdown()) {
+            return CompletableFuture.completedFuture(List.of());
+        }
         return CompletableFuture.supplyAsync(() -> repository.search(category, query, config.maxSearchResults()), executorService);
     }
 
     public CompletableFuture<Optional<LeaderboardEntry>> self(LeaderboardCategory category, UUID uuid) {
+        if (shuttingDown.get() || executorService.isShutdown()) {
+            return CompletableFuture.completedFuture(Optional.empty());
+        }
         return CompletableFuture.supplyAsync(() -> repository.self(category, uuid), executorService);
     }
 
     public void forceRefresh(Player player) {
+        if (shuttingDown.get()) {
+            return;
+        }
         queueUpdate(player);
-        executorService.submit(this::refreshCache);
+        if (!executorService.isShutdown()) {
+            executorService.submit(this::refreshCache);
+        }
     }
 
     public String displayValue(LeaderboardCategory category, LeaderboardEntry entry) {

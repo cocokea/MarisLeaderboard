@@ -46,7 +46,6 @@ public final class LeaderboardGuiManager {
         player.openInventory(inventory);
         mainMenuViewers.add(player.getUniqueId());
         boardStates.remove(player.getUniqueId());
-        playSound(player, "open-main", Sound.UI_BUTTON_CLICK, 1.0f, 1.15f);
     }
 
     public void openBoard(Player player, LeaderboardCategory category, int page, List<LeaderboardEntry> entries, String searchQuery) {
@@ -64,7 +63,12 @@ public final class LeaderboardGuiManager {
 
         if (page > 0) inventory.setItem(config.previousSlot(), new ItemBuilder(config.previousMaterial()).name(config.previousName()).lore(config.previousLore()).build());
         if (end < entries.size()) inventory.setItem(config.nextSlot(), new ItemBuilder(config.nextMaterial()).name(config.nextName()).lore(config.nextLore()).build());
-        inventory.setItem(config.refreshSlot(), new ItemBuilder(config.refreshMaterial()).name(config.refreshName()).lore(config.refreshLore()).build());
+        inventory.setItem(config.refreshSlot(), new ItemBuilder(config.categoryMaterial(category))
+                .name(config.refreshName().replace("{category}", ColorUtil.toSmallFont(category.displayName())))
+                .lore(config.refreshLore().stream()
+                        .map(line -> line.replace("{category}", ColorUtil.toSmallFont(category.displayName())))
+                        .toList())
+                .build());
         inventory.setItem(config.searchSlot(), new ItemBuilder(config.searchMaterial()).name(config.searchName()).lore(config.searchLore()).build());
 
         service.self(category, player.getUniqueId()).thenAccept(optional -> optional.ifPresent(self -> SchedulerUtil.runPlayer(plugin, player,
@@ -137,7 +141,11 @@ public final class LeaderboardGuiManager {
         if (!config.soundEnabled(key)) {
             return;
         }
-        player.playSound(player.getLocation(), config.sound(key, fallback), config.soundVolume(key, fallbackVolume), config.soundPitch(key, fallbackPitch));
+        Sound sound = config.sound(key);
+        if (sound == null) {
+            return;
+        }
+        player.playSound(player.getLocation(), sound, config.soundVolume(key, fallbackVolume), config.soundPitch(key, fallbackPitch));
     }
 
     private record MarisGuiHolder(MarisGuiType type) implements InventoryHolder {

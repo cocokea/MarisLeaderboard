@@ -7,17 +7,25 @@ import org.bukkit.Registry;
 import org.bukkit.Sound;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.io.File;
 import java.util.*;
 
 public final class PluginConfig {
     private final JavaPlugin plugin;
+    private final FileConfiguration soundsConfig;
     private final List<LeaderboardCategory> categories;
     private final Map<String, LeaderboardCategory> categoriesByKey;
 
     public PluginConfig(JavaPlugin plugin) {
         this.plugin = plugin;
+        File soundsFile = plugin.getDataFolder().toPath().resolve("sounds.yml").toFile();
+        if (!soundsFile.exists()) {
+            plugin.saveResource("sounds.yml", false);
+        }
+        this.soundsConfig = YamlConfiguration.loadConfiguration(soundsFile);
         this.categories = loadCategories();
         this.categoriesByKey = new LinkedHashMap<>();
         for (LeaderboardCategory category : categories) {
@@ -115,7 +123,7 @@ public final class PluginConfig {
     public Material searchMaterial() { return matchMaterial(c().getString("menu-items.search.material", "OAK_SIGN"), Material.OAK_SIGN); }
     public String previousName() { return c().getString("menu-items.previous-page.name"); }
     public String nextName() { return c().getString("menu-items.next-page.name"); }
-    public String refreshName() { return c().getString("menu-items.refresh.name"); }
+    public String refreshName() { return c().getString("menu-items.refresh.name", "&#00FFAA{category}"); }
     public String searchName() { return c().getString("menu-items.search.name"); }
     public List<String> previousLore() { return c().getStringList("menu-items.previous-page.lore"); }
     public List<String> nextLore() { return c().getStringList("menu-items.next-page.lore"); }
@@ -133,10 +141,10 @@ public final class PluginConfig {
     public String noPermissionMessage() { return c().getString("messages.no-permission", "&#FF5555Bạn không có quyền dùng lệnh này."); }
     public String playerOnlyMessage() { return c().getString("messages.player-only", "&#FF5555Chỉ người chơi mới dùng được lệnh này."); }
 
-    public boolean soundEnabled(String key) { return c().getBoolean("sounds." + key + ".enabled", true); }
-    public Sound sound(String key, Sound fallback) { return parseSound(c().getString("sounds." + key + ".sound", fallback.getKey().asString()), fallback); }
-    public float soundVolume(String key, float fallback) { return (float) c().getDouble("sounds." + key + ".volume", fallback); }
-    public float soundPitch(String key, float fallback) { return (float) c().getDouble("sounds." + key + ".pitch", fallback); }
+    public boolean soundEnabled(String key) { return soundsConfig.getBoolean("sounds." + key + ".enabled", true); }
+    public Sound sound(String key) { return parseSound(soundsConfig.getString("sounds." + key + ".sound")); }
+    public float soundVolume(String key, float fallback) { return (float) soundsConfig.getDouble("sounds." + key + ".volume", fallback); }
+    public float soundPitch(String key, float fallback) { return (float) soundsConfig.getDouble("sounds." + key + ".pitch", fallback); }
 
     private Material matchMaterial(String input, Material fallback) {
         if (input == null || input.isBlank()) {
@@ -146,16 +154,26 @@ public final class PluginConfig {
         return matched == null ? fallback : matched;
     }
 
-    private Sound parseSound(String input, Sound fallback) {
+    private Sound parseSound(String input) {
         if (input == null || input.isBlank()) {
-            return fallback;
+            return null;
         }
         String normalized = input.trim().toLowerCase(Locale.ROOT);
+        if (!normalized.contains(":")) {
+            normalized = "minecraft:" + normalized;
+        }
         NamespacedKey key = NamespacedKey.fromString(normalized);
         if (key == null) {
-            key = NamespacedKey.minecraft(normalized.replace('_', '.'));
+            return null;
         }
         Sound sound = Registry.SOUNDS.get(key);
-        return sound == null ? fallback : sound;
+        if (sound != null) {
+            return sound;
+        }
+        try {
+            return Sound.valueOf(input.trim().toUpperCase(Locale.ROOT));
+        } catch (IllegalArgumentException ignored) {
+            return null;
+        }
     }
 }

@@ -1,0 +1,16 @@
+sounds:
+  click:
+    enabled: true
+    sound: BLOCK_BAMBOO_WOOD_BUTTON_CLICK_OFF
+    volume: 1.0
+    pitch: 1.0
+  refresh:
+    enabled: true
+    sound: UI_TOAST_IN
+    volume: 1.0
+    pitch: 1.0
+  reload:
+    enabled: true
+    sound: BLOCK_NOTE_BLOCK_PLING
+    volume: 1.0
+    pitch: 1.25

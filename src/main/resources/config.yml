@@ -1,9 +1,11 @@
+update-checker: true
+
 gui:
   main:
     title: "ʟᴇᴀᴅᴇʀʙᴏᴀʀᴅ"
     rows: 3
   board:
-    title: "{category} - Trang {page}"
+    title: "{category} (Page {page})"
     rows: 6
 
 settings:
@@ -12,26 +14,30 @@ settings:
   max-search-results: 45
   placeholders:
     money: "%vault_eco_balance%"
-    shards: "%shards_value%"
-    kills: "%statistic_player_kills%"
     deaths: "%statistic_deaths%"
     playtime: "%plan_player_time_total%"
+    place: "%mariscoreprotect_blocks_placed_formatted%"
+    broke: "%mariscoreprotect_blocks_broken_formatted%"
+    mobs: "%statistic_mob_kills%"
   category-meta:
     money:
-      display-name: "Money"
+      display-name: "ᴍᴏsᴛ ᴍᴏɴᴇʏ"
       compact: true
-    shards:
-      display-name: "Shards"
-      compact: true
-    kills:
-      display-name: "Kills"
-      compact: false
     deaths:
-      display-name: "Deaths"
-      compact: false
+      display-name: "ᴍᴏsᴛ ᴅᴇᴀᴛʜs"
+      compact: true
     playtime:
-      display-name: "Playtime"
-      compact: false
+      display-name: "ᴍᴏsᴛ ᴘʟᴀʏᴛɪᴍᴇ"
+      compact: true
+    place:
+      display-name: "ᴍᴏsᴛ ʙʟᴏᴄᴋs ᴘʟᴀᴄᴇᴅ"
+      compact: true
+    broken:
+      display-name: "ʙʟᴏᴄᴋs ʙʀᴏᴋᴇɴ"
+      compact: true
+    mobs:
+      display-name: "ᴍᴏsᴛ ᴍᴏʙs ᴋɪʟʟᴇᴅ"
+      compact: true
   format:
     number-short-enabled: true
     number-decimals: 1
@@ -46,46 +52,52 @@ menu-items:
   categories:
     money:
       slot: 10
-      material: GOLD_INGOT
-      name: "&#00FFAAᴍᴏɴᴇʏ"
+      material: EMERALD
+      name: "&#00FFAAᴍᴏɴᴇʏ ʟᴇᴀᴅᴇʀʙᴏᴀʀᴅ"
       lore:
-        - "&fClick vào để xem bảng xếp hạng này"
-    shards:
-      slot: 11
-      material: AMETHYST_SHARD
-      name: "&#00FFAAꜱʜᴀʀᴅꜱ"
-      lore:
-        - "&fClick vào để xem bảng xếp hạng này"
-    kills:
-      slot: 12
-      material: DIAMOND_SWORD
-      name: "&#00FFAAᴋɪʟʟꜱ"
-      lore:
-        - "&fClick vào để xem bảng xếp hạng này"
+        - "&fClick to view the ᴍᴏɴᴇʏ leaderboard"
     deaths:
-      slot: 13
+      slot: 11
       material: SKELETON_SKULL
-      name: "&#00FFAAᴅᴇᴀᴛʜꜱ"
+      name: "&#00FFAAᴅᴇᴀᴛʜꜱ ʟᴇᴀᴅᴇʀʙᴏᴀʀᴅ"
       lore:
-        - "&fClick vào để xem bảng xếp hạng này"
+        - "&fClick to view the ᴅᴇᴀᴛʜꜱ leaderboard"
     playtime:
-      slot: 14
+      slot: 12
       material: CLOCK
-      name: "&#00FFAAᴘʟᴀʏᴛɪᴍᴇ"
+      name: "&#00FFAAᴘʟᴀʏᴛɪᴍᴇ ʟᴇᴀᴅᴇʀʙᴏᴀʀᴅ"
       lore:
-        - "&fClick vào để xem bảng xếp hạng này"
+        - "&fClick to view the ᴘʟᴀʏᴛɪᴍᴇ leaderboard"
+    place:
+      slot: 13
+      material: STONE
+      name: "&#00FFAAʙʟᴏᴄᴋs ᴘʟᴀᴄᴇᴅ ʟᴇᴀᴅᴇʀʙᴏᴀʀᴅ"
+      lore:
+        - "&fClick to view the ʙʟᴏᴄᴋs ᴘʟᴀᴄᴇᴅ leaderboard"
+    broke:
+      slot: 14
+      material: COBBLESTONE
+      name: "&#00FFAAʙʟᴏᴄᴋs ʙʀᴏᴋᴇɴ ʟᴇᴀᴅᴇʀʙᴏᴀʀᴅ"
+      lore:
+        - "&fClick to view the ʙʟᴏᴄᴋs ʙʀᴏᴋᴇɴ leaderboard"
+    mobs:
+      slot: 15
+      material: ZOMBIE_HEAD
+      name: "&#00FFAAᴍᴏʙs ᴋɪʟʟᴇᴅ ʟᴇᴀᴅᴇʀʙᴏᴀʀᴅ"
+      lore:
+        - "&fClick to view the ᴍᴏʙs ᴋɪʟʟᴇᴅ leaderboard"
   previous-page:
     slot: 45
     material: ARROW
-    name: "&#00FFAAᴛʀᴀɴɢ ᴛʀướᴄ"
+    name: "&#00FFAAʙᴀᴄᴋ"
     lore:
-      - "&fClick để lùi trang trước"
+      - "&fClick to go to the previous page"
   next-page:
     slot: 53
     material: ARROW
-    name: "&#00FFAAᴛʀᴀɴɢ sᴀᴜ"
+    name: "&#00FFAAɴᴇxᴛ"
     lore:
-      - "&fClick để tới trang sau"
+      - "&fClick to go to next page"
   self:
     slot: 48
     name: "&#00FFAA{player}"
@@ -93,16 +105,15 @@ menu-items:
       - "&f{category}: &7{value} &#00FFAA(#{rank})"
   refresh:
     slot: 49
-    material: ANVIL
-    name: "&#00FFAAʟàᴍ ᴍớɪ"
+    name: "&#00FFAA{category}"
     lore:
-      - "&fClick để làm mới"
+      - "&fClick to refresh!"
   search:
     slot: 50
     material: OAK_SIGN
-    name: "&#00FFAAᴛìᴍ ᴋɪếᴍ"
+    name: "&#00FFAAsᴇᴀʀᴄʜ"
     lore:
-      - "&fClick để tìm kiếm"
+      - "&fClick to search for players"
   entry:
     name: "&#00FFAA{player}"
     lore:
@@ -111,42 +122,15 @@ menu-items:
 search:
   timeout-seconds: 60
   sign-lines:
-    - "^^^^^^^^^^^^"
-    - "&0[&#00FFAASearch&0]"
-    - "&0Nhập tên"
+    - ""
+    - '§0↑↑↑↑↑↑↑↑↑↑↑↑'
+    - "§0Search"
     - ""
 
-sounds:
-  open-main:
-    enabled: true
-    sound: UI_BUTTON_CLICK
-    volume: 1.0
-    pitch: 1.15
-  click:
-    enabled: true
-    sound: UI_BUTTON_CLICK
-    volume: 1.0
-    pitch: 1.0
-  refresh:
-    enabled: true
-    sound: BLOCK_ANVIL_USE
-    volume: 1.0
-    pitch: 1.1
-  search:
-    enabled: true
-    sound: BLOCK_NOTE_BLOCK_PLING
-    volume: 1.0
-    pitch: 1.2
-  reload:
-    enabled: true
-    sound: BLOCK_NOTE_BLOCK_PLING
-    volume: 1.0
-    pitch: 1.25
-
 messages:
-  reload: "&#00FFAAĐã reload MarisLeaderboard."
-  no-permission: "&#FF5555Bạn không có quyền dùng lệnh này."
-  player-only: "&#FF5555Chỉ người chơi mới dùng được lệnh này."
+  reload: "&aĐã reload MarisLeaderboard."
+  no-permission: "&cBạn không có quyền dùng lệnh này."
+  player-only: "&cChỉ người chơi mới dùng được lệnh này."
 
 database:
   type: SQLITE
